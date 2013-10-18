@@ -13,7 +13,9 @@ def safe_log(x):
 def log_add(logA,logB):
     if logB > logA:
         return log_add(logB,logA)
+    #print "input: ", logB,logA
     #return numpy.logaddexp(logA,logB)+log(logA)
+    #print "log sum: ",log(1+exp(logB-logA)) + logA
     return log(1+exp(logB-logA)) + logA
 
 print log_add(math.log(10),math.log(12))
@@ -30,23 +32,25 @@ def basic_score(S,Sc):
         #print list_s, S[list_s],Sc[list_sc]
         #both s and sc are log10 based need to switch to ln base first 
         #based on log10(P) = ln(P)/ln10
-        for s, sc in zip(S[list_s],S[list_sc]):
+        for s, sc in zip(S[list_s],Sc[list_sc]):
             x = s*log(10)   #x is p(obs|S)
             y = sc*log(10)  #y is p(obs|S')
-            print "theta = 0.2", y+safe_log(p_Sc)
-            print "theta = 0", y+safe_log(p_S)
-            print log_add(y+safe_log(p_Sc),x+safe_log(1-p_Sc))
-            print log_add(y+safe_log(p_S),x+safe_log(1-p_S))
-            sum_all_mutate = log_add(y+safe_log(p_Sc),x+safe_log(1-p_Sc))
-            sum_all_unmutate = log_add(y+safe_log(p_S),x+safe_log(1-p_S))
+            #print "theta = 0.2", y+safe_log(p_Sc), " ", x+safe_log(1-p_Sc)
+            #print "theta = 0", y+safe_log(p_S), " ", x+safe_log(1-p_S)
+            #print log_add(y+safe_log(p_Sc),x+safe_log(1-p_Sc))
+            #print log_add(y+safe_log(p_S),x+safe_log(1-p_S))
+            #sum_all_mutate = log_add(sum_all_mutate,log_add(y+safe_log(p_Sc),x+safe_log(1-p_Sc)))
+            #sum_all_unmutate = log_add(sum_all_mutate,log_add(y+safe_log(p_S),x+safe_log(1-p_S)))
+            sum_all_mutate += log_add(y+safe_log(p_Sc),x+safe_log(1-p_Sc))
+            sum_all_unmutate += log_add(y+safe_log(p_S),x+safe_log(1-p_S))
     print "theta = 0.2: ", sum_all_mutate, "exp: ",exp(sum_all_mutate)
     print "theta = 0: ", sum_all_unmutate, "exp: ",exp(sum_all_unmutate)
-    return [sum_all_mutate, sum_all_unmutate]
+    return sum_all_mutate-sum_all_unmutate
         
 
 
 def test_main():
-    for x in range(1,2):
+    for x in range(1,11):
         s = "seq.%d.txt" % (x)
         f = open(s,'r')
         list_S = {}#dict 
